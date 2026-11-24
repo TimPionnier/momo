@@ -17,20 +17,20 @@ export function PlayerPicker({ players, onPick, detail, disabled }: Props) {
     ),
   )
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 gap-2 sm:gap-3">
       {players.map((p, i) => (
         <button
           key={p.id}
           onClick={() => onPick(p.id)}
           disabled={disabled?.(p)}
-          className="flex min-h-16 items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 text-left ring-1 ring-white/15 transition hover:bg-white/20 active:scale-[0.98] disabled:opacity-35"
+          className="flex min-h-14 min-w-0 items-center gap-2 rounded-2xl bg-white/10 px-2.5 py-2.5 sm:min-h-16 sm:gap-3 sm:px-4 sm:py-3 text-left ring-1 ring-white/15 transition hover:bg-white/20 active:scale-[0.98] disabled:opacity-35"
         >
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-display text-lg text-navy" style={{ background: p.color }}>
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-display text-base text-navy sm:h-9 sm:w-9 sm:text-lg" style={{ background: p.color }}>
             {i < 9 ? i + 1 : p.name[0]}
           </span>
           <span className="min-w-0">
-            <span className="block truncate text-lg font-bold">{p.name}</span>
-            {detail?.(p) && <span className="block text-sm text-white/60">{detail(p)}</span>}
+            <span className="block truncate text-base font-bold sm:text-lg">{p.name}</span>
+            {detail?.(p) && <span className="block truncate text-xs text-white/60 sm:text-sm">{detail(p)}</span>}
           </span>
         </button>
       ))}

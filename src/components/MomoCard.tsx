@@ -2,11 +2,13 @@ import { motion } from 'framer-motion'
 import { ArrowDownUp, Zap } from 'lucide-react'
 import type { Card } from '../game/types'
 
-type Size = 'sm' | 'md' | 'lg'
+type Size = 'sm' | 'fluid' | 'md' | 'lg'
 
 const SIZES: Record<Size, string> = {
   sm: 'w-16 h-24 rounded-xl text-4xl',
-  md: 'w-24 h-36 sm:w-28 sm:h-40 rounded-2xl text-6xl sm:text-7xl',
+  /** Compacte sur téléphone (beaucoup de cartes), normale dès 640 px */
+  fluid: 'w-[4.4rem] h-[6.6rem] rounded-xl text-[2.6rem] sm:w-28 sm:h-40 sm:rounded-2xl sm:text-7xl short:w-16! short:h-24! short:rounded-xl! short:text-4xl!',
+  md: 'w-24 h-36 sm:w-28 sm:h-40 rounded-2xl text-6xl sm:text-7xl short:w-16! short:h-24! short:rounded-xl! short:text-4xl!',
   lg: 'w-32 h-48 sm:w-40 sm:h-56 rounded-3xl text-8xl sm:text-9xl',
 }
 
@@ -112,7 +114,7 @@ interface Props {
 
 export function MomoCard({ card, size = 'md', flip = true, delay = 0, caption, captionColor }: Props) {
   return (
-    <figure className="flex flex-col items-center gap-2" aria-label={cardLabel(card)} data-testid="momo-card" data-kind={card.kind}>
+    <figure className="flex flex-col items-center gap-1.5 sm:gap-2" aria-label={cardLabel(card)} data-testid="momo-card" data-kind={card.kind}>
       <div className="perspective">
         <motion.div
           className={`relative ${SIZES[size]}`}
@@ -130,7 +132,7 @@ export function MomoCard({ card, size = 'md', flip = true, delay = 0, caption, c
         </motion.div>
       </div>
       {caption && (
-        <figcaption className="max-w-[8rem] truncate rounded-full px-2 py-0.5 text-xs font-semibold sm:text-sm" style={{ background: captionColor ?? 'rgba(255,255,255,.12)' }}>
+        <figcaption className="max-w-[5rem] truncate rounded-full px-2 py-0.5 text-[11px] font-semibold sm:max-w-[8rem] sm:text-sm" style={{ background: captionColor ?? 'rgba(255,255,255,.12)' }}>
           {caption}
         </figcaption>
       )}

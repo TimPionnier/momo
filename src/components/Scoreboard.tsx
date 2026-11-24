@@ -52,23 +52,30 @@ export function Scoreboard({ rows, teams, winsTarget }: Props) {
           ))}
         </div>
       )}
-      <ul className="scrollbar-none -mx-4 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0">
+      {/* Mobile : grille compacte où tous les joueurs restent visibles ; grand écran : colonne détaillée */}
+      <ul className={`grid gap-1.5 ${rows.length > 4 ? 'grid-cols-3' : 'grid-cols-2'} sm:grid-cols-3 short:grid-cols-4 lg:flex lg:flex-col lg:gap-2`}>
         {rows.map((r) => (
           <motion.li
             layout
             key={r.player.id}
-            className={`flex min-w-[9.5rem] shrink-0 items-center gap-3 rounded-2xl px-3 py-2 ring-1 transition lg:min-w-0 ${
+            className={`flex min-w-0 items-center gap-2 rounded-xl border-l-4 py-1.5 pl-2 pr-2.5 ring-1 transition lg:gap-3 lg:rounded-2xl lg:border-l-0 lg:px-3 lg:py-2 ${
               r.highlight ? 'bg-momo-yellow/15 ring-momo-yellow' : 'bg-white/8 ring-white/10'
             } ${r.dim || r.out ? 'opacity-45' : ''}`}
+            style={{ borderLeftColor: r.player.color }}
             data-testid={`score-${r.player.name}`}
           >
-            <span className="h-8 w-8 shrink-0 rounded-full ring-2 ring-white/30" style={{ background: r.player.color }} aria-hidden />
+            <span className="hidden h-8 w-8 shrink-0 rounded-full ring-2 ring-white/30 lg:block" style={{ background: r.player.color }} aria-hidden />
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1 truncate font-bold lg:text-lg">
-                {r.out && <Skull className="h-4 w-4 shrink-0" aria-label="éliminé" />}
+              <div className="flex items-center gap-1 text-sm font-bold lg:text-lg">
+                {r.out && <Skull className="h-3.5 w-3.5 shrink-0 lg:h-4 lg:w-4" aria-label="éliminé" />}
                 <span className="truncate">{r.player.name}</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-white/70 lg:text-sm">
+              {r.wins !== undefined && winsTarget && r.wins > 0 && (
+                <div className="flex items-center gap-0.5 text-xs font-semibold text-momo-yellow lg:hidden" aria-hidden>
+                  <Crown className="h-3 w-3 fill-momo-yellow" /> {r.wins}
+                </div>
+              )}
+              <div className="hidden items-center gap-2 text-xs text-white/70 lg:flex lg:text-sm">
                 {r.wins !== undefined && winsTarget && <Wins wins={r.wins} target={winsTarget} />}
                 {r.left !== undefined && !r.out && (
                   <span className="flex items-center gap-0.5" title="Cartes restantes dans la pile">
@@ -81,7 +88,7 @@ export function Scoreboard({ rows, teams, winsTarget }: Props) {
               key={r.collected}
               initial={{ scale: 1.6, color: '#ffc533' }}
               animate={{ scale: 1, color: '#ffffff' }}
-              className="font-display text-2xl tabular-nums lg:text-3xl"
+              className="shrink-0 font-display text-xl tabular-nums lg:text-3xl"
               aria-label={`${r.collected} cartes ramassées`}
               data-testid="collected"
             >

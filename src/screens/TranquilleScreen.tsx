@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Check, Hand, Timer, X, Zap } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '../components/Button'
 import { ChronoOverlay } from '../components/ChronoOverlay'
 import { ConstraintsPanel } from '../components/ConstraintsPanel'
@@ -37,6 +37,13 @@ export function TranquilleScreen({ game, sound, modalOpen, onDraw, onSuccess, on
   const [launcher, setLauncher] = useState<string | null>(null)
   const player = currentPlayer(game)
   const top = game.stack[game.stack.length - 1]
+  const stackRef = useRef<HTMLDivElement>(null)
+
+  // Garde la dernière carte piochée visible quand la pile déborde
+  useEffect(() => {
+    const el = stackRef.current
+    if (el) el.scrollLeft = el.scrollWidth
+  }, [game.stack.length])
 
   useEffect(() => {
     if (game.phase === 'answer' && top) play(top.kind === 'flash' ? 'flash' : 'flip', sound)
@@ -81,7 +88,7 @@ export function TranquilleScreen({ game, sound, modalOpen, onDraw, onSuccess, on
         </div>
       </aside>
 
-      <main className="flex min-h-[60dvh] flex-col gap-5 pb-48 pt-4 lg:pb-8 lg:pt-0">
+      <main className="flex flex-col gap-4 pb-48 pt-3 short:pb-2 lg:min-h-[60dvh] lg:gap-5 lg:pb-8 lg:pt-0">
         {game.lastTurn && (
           <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="rounded-2xl bg-momo-yellow px-4 py-2 text-center font-bold text-navy">
             <Zap className="mr-1 inline h-5 w-5 fill-navy" /> 2ᵉ Flash ! Dernier tour, la partie s’arrête après.
@@ -96,7 +103,7 @@ export function TranquilleScreen({ game, sound, modalOpen, onDraw, onSuccess, on
             className="text-center"
           >
             {game.lastEvent && <p className="mb-1 text-white/70">{game.lastEvent}</p>}
-            <h2 className="font-display text-4xl sm:text-5xl" data-testid="current-player">
+            <h2 className="font-display text-3xl sm:text-5xl" data-testid="current-player">
               Au tour de <span style={{ color: player.color }}>{player.name}</span>
             </h2>
             <p className="mt-1 text-white/70">
@@ -105,18 +112,26 @@ export function TranquilleScreen({ game, sound, modalOpen, onDraw, onSuccess, on
           </motion.div>
         </AnimatePresence>
 
-        <div className="flex min-h-48 flex-wrap items-end justify-center gap-2 sm:gap-3">
-          {game.stack.length === 0 && game.phase === 'draw' && <CardBack />}
-          {game.stack.map((c, i) => (
-            <MomoCard key={`${c.id}-${i}`} card={c} size={i === game.stack.length - 1 ? 'md' : 'sm'} flip={i === game.stack.length - 1} />
-          ))}
-        </div>
+        {game.stack.length > 0 && <ConstraintsPanel cards={game.stack} title="Respectez toutes les cartes" flashText={`Carte Flash : ${game.flashCount} / ${FLASHES_TO_END}, la partie s’arrête à la 2ᵉ.`} />}
 
-        {game.stack.length > 0 && <ConstraintsPanel cards={game.stack} title="Le mot doit respecter toutes les cartes" />}
+        {/* Pile en éventail : les cartes se chevauchent, la plus récente est mise en avant */}
+        <div ref={stackRef} className="scrollbar-none -mx-4 flex min-h-32 items-end overflow-x-auto px-4 pb-1 pt-2 sm:min-h-48">
+          <div className="mx-auto flex items-end">
+            {game.stack.length === 0 && game.phase === 'draw' && <CardBack />}
+            {game.stack.map((c, i) => {
+              const last = i === game.stack.length - 1
+              return (
+                <div key={`${c.id}-${i}`} className={`shrink-0 ${i > 0 ? (last ? '-ml-4 sm:ml-3' : '-ml-8 sm:ml-3') : ''}`} style={{ zIndex: i }}>
+                  <MomoCard card={c} size={last ? 'md' : 'sm'} flip={last} />
+                </div>
+              )
+            })}
+          </div>
+        </div>
       </main>
 
-      <div className="pb-safe fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-navy-deep via-navy-deep/95 to-transparent px-4 pt-8 lg:static lg:col-start-2 lg:bg-none lg:p-0">
-        <div className="mx-auto flex max-w-3xl flex-col gap-2">
+      <div className="pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-navy-deep/95 px-4 pt-3 backdrop-blur-md short:static short:border-0 short:bg-transparent short:px-0 short:backdrop-blur-none lg:static lg:col-start-2 lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
+        <div className="mx-auto flex max-w-3xl flex-col gap-2 short:max-w-none short:flex-row short:items-stretch [&>*]:short:flex-1">
           {game.phase === 'draw' ? (
             <Button big onClick={onDraw} icon={<Hand className="h-6 w-6" />} kbd="Espace">
               {player.name} pioche une carte
@@ -128,7 +143,8 @@ export function TranquilleScreen({ game, sound, modalOpen, onDraw, onSuccess, on
               </Button>
               <div className="grid grid-cols-2 gap-2">
                 <Button big variant="danger" onClick={() => { onFail(); play('fail', sound) }} icon={<X className="h-6 w-6" />} kbd="⌫">
-                  Raté / sèche
+                  <span className="sm:hidden">Raté</span>
+                  <span className="hidden sm:inline">Raté / sèche</span>
                 </Button>
                 <Button big variant="success" onClick={primary} icon={<Check className="h-6 w-6" />} kbd="Espace">
                   Trouvé !

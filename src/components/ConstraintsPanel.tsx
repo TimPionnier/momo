@@ -7,18 +7,20 @@ import type { Card } from '../game/types'
 interface Props {
   cards: Card[]
   title?: string
+  /** Texte du bandeau Flash (la carte n'a pas le même effet selon le mode) */
+  flashText?: string
 }
 
 function Chip({ children, className }: { children: ReactNode; className: string }) {
   return (
-    <span className={`inline-flex items-center gap-1 rounded-xl px-3 py-1 font-display text-2xl leading-none shadow sm:text-3xl ${className}`}>
+    <span className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 font-display text-xl leading-none shadow sm:rounded-xl sm:px-3 sm:text-3xl ${className}`}>
       {children}
     </span>
   )
 }
 
 /** Résumé lisible à distance des contraintes actives du tour. */
-export function ConstraintsPanel({ cards, title }: Props) {
+export function ConstraintsPanel({ cards, title, flashText = 'FLASH ! Le 1er qui répond arrête le tour et donne les cartes à qui il veut.' }: Props) {
   const c = resolveConstraints(cards)
   const required = Object.entries(c.required)
   return (
@@ -26,18 +28,18 @@ export function ConstraintsPanel({ cards, title }: Props) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.35 }}
-      className="w-full rounded-3xl bg-white/8 p-4 ring-1 ring-white/10 backdrop-blur sm:p-5"
+      className="w-full rounded-2xl bg-white/8 p-3 ring-1 ring-white/10 backdrop-blur sm:rounded-3xl sm:p-5"
       aria-label={title ?? 'Contraintes du tour'}
       data-testid="constraints"
     >
-      {title && <h3 className="mb-3 font-display text-xl tracking-wide text-momo-yellow">{title}</h3>}
+      {title && <h3 className="mb-2 font-display text-lg tracking-wide text-momo-yellow sm:mb-3 sm:text-xl">{title}</h3>}
       {c.flash && (
-        <div className="mb-3 flex items-center gap-2 rounded-2xl bg-momo-yellow px-3 py-2 font-bold text-navy">
+        <div className="mb-3 flex items-center gap-2 rounded-xl bg-momo-yellow px-3 py-2 text-sm font-bold text-navy sm:rounded-2xl sm:text-base">
           <Zap className="h-5 w-5 shrink-0 fill-navy" />
-          <span>FLASH ! Le 1er qui répond arrête le tour et donne les cartes à qui il veut.</span>
+          <span>{flashText}</span>
         </div>
       )}
-      <ul className="flex flex-col gap-3 text-base sm:text-lg">
+      <ul className="flex flex-col gap-2.5 text-[15px] sm:gap-3 sm:text-lg">
         {required.length > 0 && (
           <li className="flex flex-wrap items-center gap-2">
             <CheckCircle2 className="h-5 w-5 text-momo-blue-light" aria-hidden />
@@ -55,7 +57,7 @@ export function ConstraintsPanel({ cards, title }: Props) {
             <Ban className="h-5 w-5 text-momo-red-light" aria-hidden />
             <span className="mr-1 font-semibold">Interdit</span>
             {c.forbidden.map((l) => (
-              <Chip key={l} className="bg-momo-red line-through decoration-2">
+              <Chip key={l} className="bg-momo-red">
                 {l}
               </Chip>
             ))}
@@ -68,7 +70,7 @@ export function ConstraintsPanel({ cards, title }: Props) {
             {c.themes.map((t, i) => (
               <span key={t.theme} className="flex items-center gap-2">
                 {i > 0 && <span className="text-sm font-bold uppercase text-white/60">ou</span>}
-                <span className="rounded-xl bg-momo-yellow px-3 py-1 text-lg font-bold text-momo-brown shadow sm:text-xl">
+                <span className="rounded-lg bg-momo-yellow px-2.5 py-1 text-base font-bold leading-tight text-momo-brown shadow sm:rounded-xl sm:px-3 sm:text-xl">
                   {t.emoji} {t.theme}
                 </span>
               </span>

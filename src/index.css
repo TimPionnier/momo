@@ -19,6 +19,9 @@
   color-scheme: dark;
 }
 
+/* Téléphone en paysage / écrans peu hauts : la barre d'actions suit le contenu au lieu d'être fixe */
+@custom-variant short (@media (max-height: 520px) and (max-width: 1023px));
+
 html,
 body,
 #root {

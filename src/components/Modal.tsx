@@ -13,6 +13,16 @@ interface Props {
 /** Feuille en bas d'écran sur mobile, boîte centrée sur grand écran. */
 export function Modal({ open, onClose, title, children, wide }: Props) {
   const id = useId()
+  // Bloque le défilement de la page derrière la feuille (mobile)
+  useEffect(() => {
+    if (!open) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [open])
+
   useEffect(() => {
     if (!open || !onClose) return
     const onKey = (e: KeyboardEvent) => {

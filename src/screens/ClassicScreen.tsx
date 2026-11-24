@@ -131,10 +131,10 @@ export function ClassicScreen(props: Props) {
         )}
       </aside>
 
-      <main className="flex min-h-[60dvh] flex-col pb-40 pt-4 lg:pb-8 lg:pt-0">
+      <main className="flex flex-col pb-44 pt-3 short:pb-2 lg:min-h-[60dvh] lg:pb-8 lg:pt-0">
         <AnimatePresence mode="wait">
           {game.phase === 'ready' && (
-            <motion.section key={`ready-${game.round}-${game.turn}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-1 flex-col items-center justify-center gap-6 text-center">
+            <motion.section key={`ready-${game.round}-${game.turn}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-1 flex-col items-center justify-center gap-5 py-4 text-center lg:gap-6">
               {game.suddenDeath ? (
                 <div className="flex flex-col items-center gap-2">
                   <Skull className="h-14 w-14 text-momo-red-light" />
@@ -170,7 +170,7 @@ export function ClassicScreen(props: Props) {
           )}
 
           {game.phase === 'play' && (
-            <motion.section key={`play-${game.round}-${game.turn}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col gap-5">
+            <motion.section key={`play-${game.round}-${game.turn}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col gap-4 sm:gap-5">
               {game.relaunches > 0 && (
                 <div className="rounded-2xl bg-white/8 px-4 py-2 text-center text-sm sm:text-base">
                   <RefreshCw className="mr-1 inline h-4 w-4" />
@@ -180,13 +180,15 @@ export function ClassicScreen(props: Props) {
               )}
               <div className={`grid gap-6 ${twoWords && groups.length > 1 ? 'xl:grid-cols-2' : ''}`}>
                 {groups.map((group, gi) => (
-                  <div key={group.pile} className="flex flex-col items-center gap-4">
-                    <div className="flex flex-wrap justify-center gap-3 sm:gap-5" key={`${game.turn}-${game.relaunches}`}>
+                  <div key={group.pile} className="flex flex-col items-center gap-3 sm:gap-4">
+                    <div className="flex flex-wrap justify-center gap-2 sm:gap-5" key={`${game.turn}-${game.relaunches}`}>
                       {group.center.map((c, i) => (
-                          <MomoCard key={`${c.card.id}-${c.playerId}`} card={c.card} delay={i * 0.12} caption={playerName(game.players, c.playerId)} captionColor={byId(c.playerId).color + '55'} />
+                          <MomoCard key={`${c.card.id}-${c.playerId}`} card={c.card} size={game.center.length > 3 ? 'fluid' : 'md'} delay={i * 0.12} caption={playerName(game.players, c.playerId)} captionColor={byId(c.playerId).color + '55'} />
                       ))}
                     </div>
-                    <ConstraintsPanel cards={group.center.map((c) => c.card)} title={twoWords && groups.length > 1 ? `Mot ${gi + 1}` : undefined} />
+                    <div className="order-first w-full sm:order-none short:order-first!">
+                      <ConstraintsPanel cards={group.center.map((c) => c.card)} title={twoWords && groups.length > 1 ? `Mot ${gi + 1}` : undefined} />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -203,8 +205,8 @@ export function ClassicScreen(props: Props) {
       </main>
 
       {game.phase !== 'gameOver' && (
-        <div className="pb-safe fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-navy-deep via-navy-deep/95 to-transparent px-4 pt-8 lg:static lg:col-start-2 lg:bg-none lg:p-0">
-          <div className="mx-auto flex max-w-3xl flex-col gap-2">
+        <div className="pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-navy-deep/95 px-4 pt-3 backdrop-blur-md short:static short:border-0 short:bg-transparent short:px-0 short:backdrop-blur-none lg:static lg:col-start-2 lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
+          <div className="mx-auto flex max-w-3xl flex-col gap-2 short:max-w-none short:flex-row short:items-stretch [&>*]:short:flex-1">
             {game.phase === 'ready' && (
               <Button big onClick={startReveal} icon={<Eye className="h-6 w-6" />} kbd="Espace">
                 Retourner les cartes
@@ -213,7 +215,7 @@ export function ClassicScreen(props: Props) {
             {game.phase === 'play' && (
               <>
                 <div className="grid grid-cols-2 gap-2">
-                  <Button variant="secondary" onClick={() => onRelaunch()} disabled={!canRelaunch(game)} icon={<HelpCircle className="h-5 w-5" />}>
+                  <Button variant="secondary" onClick={() => onRelaunch()} disabled={!canRelaunch(game)} icon={<HelpCircle className="hidden h-5 w-5 sm:block" />}>
                     Personne ne trouve
                   </Button>
                   <Button
@@ -223,7 +225,7 @@ export function ClassicScreen(props: Props) {
                       setSheet('partial')
                     }}
                     disabled={!canRelaunch(game) || game.inTurn.length < 3}
-                    icon={<Users className="h-5 w-5" />}
+                    icon={<Users className="hidden h-5 w-5 sm:block" />}
                   >
                     Plusieurs sèchent
                   </Button>
@@ -331,9 +333,9 @@ function RoundEnd({ game }: { game: ClassicGame }) {
   else headline = `${last.winners.map((id) => playerName(game.players, id)).join(' & ')} gagne${last.winners.length > 1 ? 'nt' : ''} la manche !`
 
   return (
-    <motion.section initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="mx-auto flex w-full max-w-xl flex-col gap-5 text-center" aria-label="Fin de manche">
+    <motion.section initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="mx-auto flex w-full max-w-xl flex-col gap-4 text-center sm:gap-5" aria-label="Fin de manche">
       <p className="font-display text-xl text-white/60">{game.mode === 'survival' ? 'Fin de manche' : `Fin de la manche ${last.round}`}</p>
-      <h2 className="font-display text-4xl text-momo-yellow sm:text-5xl" data-testid="round-headline">
+      <h2 className="font-display text-3xl leading-tight text-momo-yellow sm:text-5xl" data-testid="round-headline">
         {headline}
       </h2>
       {game.mode === 'team' && (
@@ -349,11 +351,11 @@ function RoundEnd({ game }: { game: ClassicGame }) {
       )}
       <ol className="flex flex-col gap-2">
         {ranked.map((p) => (
-          <li key={p.id} className={`flex items-center gap-3 rounded-2xl px-4 py-3 ${last.winners.includes(p.id) ? 'bg-momo-yellow text-navy' : p.id === last.eliminated ? 'bg-momo-red/80' : 'bg-white/8'}`}>
-            <span className="h-6 w-6 rounded-full ring-2 ring-white/40" style={{ background: p.color }} aria-hidden />
-            <span className="flex-1 text-left text-lg font-bold">{p.name}</span>
-            <span className="font-semibold">{plural(last.collected[p.id], 'carte')}</span>
-            {game.mode === 'classic' && <span className="w-16 text-right text-sm font-semibold">{game.roundWins[p.id]} / {ROUNDS_TO_WIN}</span>}
+          <li key={p.id} className={`flex items-center gap-3 rounded-2xl px-3 py-2 sm:px-4 sm:py-3 ${last.winners.includes(p.id) ? 'bg-momo-yellow text-navy' : p.id === last.eliminated ? 'bg-momo-red/80' : 'bg-white/8'}`}>
+            <span className="h-5 w-5 shrink-0 rounded-full ring-2 ring-navy/40 sm:h-6 sm:w-6" style={{ background: p.color }} aria-hidden />
+            <span className="min-w-0 flex-1 truncate text-left text-base font-bold sm:text-lg">{p.name}</span>
+            <span className="shrink-0 text-sm font-semibold sm:text-base">{plural(last.collected[p.id], 'carte')}</span>
+            {game.mode === 'classic' && <span className="w-10 shrink-0 text-right text-sm font-semibold sm:w-16">{game.roundWins[p.id]} / {ROUNDS_TO_WIN}</span>}
           </li>
         ))}
       </ol>

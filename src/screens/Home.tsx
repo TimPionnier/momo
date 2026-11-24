@@ -22,14 +22,14 @@ interface Props {
 export function Home({ canResume, onResume, onNew, onRules }: Props) {
   useHotkeys({ ' ': () => (canResume ? onResume() : onNew()), Enter: () => (canResume ? onResume() : onNew()) })
   return (
-    <div className="mx-auto flex min-h-dvh max-w-xl flex-col items-center justify-between px-4 pb-safe pt-10 sm:justify-center sm:gap-10">
+    <div className="mx-auto flex min-h-dvh max-w-xl flex-col items-center justify-between px-4 pb-safe pt-8 sm:justify-center sm:gap-10">
       <div className="flex flex-col items-center gap-3 text-center">
         <Logo />
         <p className="font-display text-2xl text-momo-yellow sm:text-3xl">Le compagnon de jeu</p>
         <p className="max-w-sm text-white/70">Les mots se crient à voix haute, l’appli s’occupe des cartes, des contraintes et des scores.</p>
       </div>
 
-      <div className="my-8 flex items-end justify-center" aria-hidden>
+      <div className="my-4 flex items-end justify-center sm:my-8" aria-hidden>
         {DECO.map((c, i) => (
           <motion.div
             key={c.id}
